@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import type { Video } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Search, Plus } from "lucide-react";
+import { Loader2, Search, Plus, Eye } from "lucide-react";
 import Image from "next/image";
 import { ScrollArea } from "./ui/scroll-area";
 
@@ -183,8 +183,7 @@ export default function YoutubeSearch({
                     {searchResults.map((result) => (
                         <div
                           key={result.id.videoId}
-                          className="flex flex-col sm:flex-row items-center gap-4 p-2 rounded-lg hover:bg-muted cursor-pointer"
-                          onClick={() => handlePlayVideo(result)}
+                          className="flex flex-col sm:flex-row items-center gap-4 p-2 rounded-lg hover:bg-muted"
                         >
                           <Image
                             src={result.snippet.thumbnails.default.url}
@@ -197,14 +196,24 @@ export default function YoutubeSearch({
                             <p className="font-semibold text-sm truncate">{result.snippet.title}</p>
                             <p className="text-xs text-muted-foreground line-clamp-2">{result.snippet.description}</p>
                           </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="w-full sm:w-auto mt-2 sm:mt-0"
-                            onClick={(e) => { e.stopPropagation(); handleAddVideo(result); }}
-                          >
-                            <Plus className="mr-2 h-4 w-4" /> Add to Playlist
-                          </Button>
+                          <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => handlePlayVideo(result)}
+                            >
+                              <Eye className="mr-2 h-4 w-4" /> View
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full"
+                              onClick={(e) => { e.stopPropagation(); handleAddVideo(result); }}
+                            >
+                              <Plus className="mr-2 h-4 w-4" /> Add
+                            </Button>
+                          </div>
                         </div>
                     ))}
                     </div>
