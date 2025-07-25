@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,11 +7,13 @@ import useLocalStorage from "@/hooks/use-local-storage";
 import VideoPlayer from "@/components/video-player";
 import Playlist from "@/components/playlist";
 import { Icons } from "@/components/icons";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Home() {
   const [playlist, setPlaylist] = useLocalStorage<Video[]>("playlist", []);
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedVideos, setSelectedVideos] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!currentVideo && playlist.length > 0) {
@@ -22,7 +25,11 @@ export default function Home() {
   }, [playlist, currentVideo]);
 
   const handleSelectVideo = (video: Video) => {
-    setCurrentVideo(video);
+    if (editMode) {
+      handleToggleSelection(video.id);
+    } else {
+      setCurrentVideo(video);
+    }
   };
 
   const handleAddVideo = (video: Video) => {
@@ -39,6 +46,22 @@ export default function Home() {
   const handleClearPlaylist = () => {
     setPlaylist([]);
     setCurrentVideo(null);
+  };
+
+  const handleToggleSelection = (videoId: string) => {
+    const newSelection = new Set(selectedVideos);
+    if (newSelection.has(videoId)) {
+      newSelection.delete(videoId);
+    } else {
+      newSelection.add(videoId);
+    }
+    setSelectedVideos(newSelection);
+  };
+
+  const handleDeleteSelected = () => {
+    setPlaylist(playlist.filter((video) => !selectedVideos.has(video.id)));
+    setSelectedVideos(new Set());
+    setEditMode(false);
   };
 
   return (
@@ -76,8 +99,11 @@ export default function Home() {
             onAddVideo={handleAddVideo}
             onRemoveVideo={handleRemoveVideo}
             onSelectVideo={handleSelectVideo}
-            onClearPlaylist={handleClearPlaylist}
             currentVideoId={currentVideo?.id}
+            editMode={editMode}
+            onEditModeChange={setEditMode}
+            selectedVideos={selectedVideos}
+            onDeleteSelected={handleDeleteSelected}
           />
         </div>
       </div>
