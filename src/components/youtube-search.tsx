@@ -31,6 +31,7 @@ import { ScrollArea } from "./ui/scroll-area";
 interface YoutubeSearchProps {
   children: ReactNode;
   onAddVideo: (video: Video) => void;
+  onSelectVideo: (video: Video) => void;
 }
 
 const formSchema = z.object({
@@ -49,9 +50,21 @@ interface YoutubeSearchResult {
     }
 }
 
+function youtubeResultToVideo(searchResult: YoutubeSearchResult): Video {
+    return {
+        id: crypto.randomUUID(),
+        videoId: searchResult.id.videoId,
+        platform: 'youtube',
+        title: searchResult.snippet.title,
+        description: searchResult.snippet.description || "",
+        tags: (searchResult.snippet.tags || []).join(", "),
+    }
+}
+
 export default function YoutubeSearch({
   children,
   onAddVideo,
+  onSelectVideo,
 }: YoutubeSearchProps) {
   const [open, setOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -70,6 +83,15 @@ export default function YoutubeSearch({
     setSearchResults([]);
     try {
       const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+      if (!apiKey) {
+        toast({
+          variant: "destructive",
+          title: "Setup Incomplete",
+          description: "YouTube API key is not configured.",
+        });
+        setIsSearching(false);
+        return;
+      }
       const response = await fetch(
         `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${values.query}&key=${apiKey}&type=video&maxResults=10`
       );
@@ -96,20 +118,18 @@ export default function YoutubeSearch({
   }
 
   function handleAddVideo(searchResult: YoutubeSearchResult) {
-    const newVideo: Video = {
-      id: crypto.randomUUID(),
-      videoId: searchResult.id.videoId,
-      platform: 'youtube',
-      title: searchResult.snippet.title,
-      description: searchResult.snippet.description || "",
-      tags: (searchResult.snippet.tags || []).join(", "),
-    };
-
+    const newVideo = youtubeResultToVideo(searchResult);
     onAddVideo(newVideo);
     toast({
       title: "Video Added!",
       description: `${newVideo.title} has been added to your playlist.`,
     });
+  }
+
+  function handlePlayVideo(searchResult: YoutubeSearchResult) {
+    const video = youtubeResultToVideo(searchResult);
+    onSelectVideo(video);
+    setOpen(false);
   }
 
   return (
@@ -161,21 +181,30 @@ export default function YoutubeSearch({
                 <ScrollArea className="h-80">
                     <div className="space-y-2 pr-4">
                     {searchResults.map((result) => (
-                        <div key={result.id.videoId} className="flex items-center gap-4 p-2 rounded-lg hover:bg-muted">
-                            <Image
-                                src={result.snippet.thumbnails.default.url}
-                                alt={result.snippet.title}
-                                width={120}
-                                height={90}
-                                className="rounded-md object-cover w-24 h-16"
-                            />
-                            <div className="flex-1 overflow-hidden">
-                                <p className="font-semibold text-sm truncate">{result.snippet.title}</p>
-                                <p className="text-xs text-muted-foreground line-clamp-2">{result.snippet.description}</p>
-                            </div>
-                            <Button size="icon" variant="ghost" onClick={() => handleAddVideo(result)}>
-                                <Plus className="h-5 w-5"/>
-                            </Button>
+                        <div
+                          key={result.id.videoId}
+                          className="flex flex-col sm:flex-row items-center gap-4 p-2 rounded-lg hover:bg-muted cursor-pointer"
+                          onClick={() => handlePlayVideo(result)}
+                        >
+                          <Image
+                            src={result.snippet.thumbnails.default.url}
+                            alt={result.snippet.title}
+                            width={120}
+                            height={90}
+                            className="rounded-md object-cover w-full sm:w-24 h-auto sm:h-16 flex-shrink-0"
+                          />
+                          <div className="flex-1 w-full overflow-hidden">
+                            <p className="font-semibold text-sm truncate">{result.snippet.title}</p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">{result.snippet.description}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full sm:w-auto mt-2 sm:mt-0"
+                            onClick={(e) => { e.stopPropagation(); handleAddVideo(result); }}
+                          >
+                            <Plus className="mr-2 h-4 w-4" /> Add to Playlist
+                          </Button>
                         </div>
                     ))}
                     </div>
