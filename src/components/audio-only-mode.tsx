@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -83,6 +84,9 @@ export default function AudioOnlyMode({ video }: AudioOnlyModeProps) {
       
       <Dialog open={isLoading}>
         <DialogContent hideCloseButton>
+            <DialogHeader>
+                <DialogTitle className="sr-only">Generating suggestion</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col items-center justify-center p-8 gap-4">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 <p className="font-headline text-lg text-muted-foreground">Generating suggestion...</p>
