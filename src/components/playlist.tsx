@@ -74,7 +74,7 @@ export default function Playlist({
               <Button size="sm" variant="outline" onClick={() => onEditModeChange(true)} disabled={playlist.length === 0}>
                 <Pencil className="mr-2 h-4 w-4" /> Edit
               </Button>
-              <YoutubeSearch onAddVideo={onAddVideo}>
+              <YoutubeSearch onAddVideo={onAddVideo} onSelectVideo={onSelectVideo}>
                 <Button size="sm" variant="outline">
                   <Search className="mr-2 h-4 w-4" /> Search
                 </Button>
