@@ -8,6 +8,7 @@ import VideoPlayer from "@/components/video-player";
 import Playlist from "@/components/playlist";
 import { Icons } from "@/components/icons";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [playlist, setPlaylist] = useLocalStorage<Video[]>("playlist", []);
@@ -83,11 +84,17 @@ export default function Home() {
       <div className="flex flex-col lg:flex-row h-screen">
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 sm:p-6 md:p-8 space-y-8">
-            <div className="flex items-center gap-4">
-              <Icons.logo className="h-10 w-10 text-primary" />
-              <h1 className="text-3xl lg:text-4xl font-headline font-bold text-foreground">
-                StreamVerse
-              </h1>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Icons.logo className="h-10 w-10 text-primary" />
+                <h1 className="text-3xl lg:text-4xl font-headline font-bold text-foreground">
+                  StreamVerse
+                </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground hidden md:block">download this app to watch web series</p>
+                <Button onClick={() => window.open("https://castleapps.org/", "_blank")}>Web Series</Button>
+              </div>
             </div>
 
             {currentVideo ? (
