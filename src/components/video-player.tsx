@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -39,7 +40,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
       </CardHeader>
       <CardContent>
         <Separator className="my-4" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <AudioOnlyMode video={video} isAudioOnly={isAudioOnly} onToggle={setIsAudioOnly} />
             <VideoIntelligence video={video} />
             <CopyrightHelper video={video} />
