@@ -56,10 +56,10 @@ export default function Playlist({
   };
 
   return (
-    <Card className="lg:h-screen lg:flex lg:flex-col border-0 lg:border-none lg:rounded-none">
+    <Card className="flex flex-col border-0 rounded-none h-full">
       <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
         <CardTitle className="font-headline text-2xl">Playlist</CardTitle>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
            {editMode ? (
             <>
               <Button size="sm" variant="destructive" onClick={handleDelete} disabled={selectedVideos.size === 0}>
@@ -89,7 +89,7 @@ export default function Playlist({
         </div>
       </CardHeader>
       <CardContent className="p-0 flex-1">
-        <ScrollArea className="h-[calc(100vh-10rem)] lg:h-[calc(100vh-5.5rem)]">
+        <ScrollArea className="h-full">
           {playlist.length > 0 ? (
             <div className="space-y-2 p-4 sm:p-6 pt-0">
               {playlist.map((video) => (

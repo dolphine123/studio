@@ -66,8 +66,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body">
-      <div className="flex flex-col lg:flex-row">
-        <div className="w-full lg:w-[calc(100%-24rem)] xl:w-[calc(100%-28rem)]">
+      <div className="flex flex-col lg:flex-row h-screen">
+        <div className="flex-1 overflow-y-auto">
           <div className="p-4 sm:p-6 md:p-8 space-y-8">
             <div className="flex items-center gap-4">
               <Icons.logo className="h-10 w-10 text-primary" />
@@ -93,7 +93,7 @@ export default function Home() {
             )}
           </div>
         </div>
-        <div className="w-full lg:w-96 xl:w-112 lg:min-h-screen lg:border-l lg:border-border">
+        <div className="w-full lg:w-96 xl:w-112 lg:h-screen lg:border-l lg:border-border flex flex-col">
           <Playlist
             playlist={playlist}
             onAddVideo={handleAddVideo}
