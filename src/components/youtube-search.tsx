@@ -128,6 +128,7 @@ export default function YoutubeSearch({
 
   function handlePlayVideo(searchResult: YoutubeSearchResult) {
     const video = youtubeResultToVideo(searchResult);
+    onAddVideo(video);
     onSelectVideo(video);
     setOpen(false);
   }
