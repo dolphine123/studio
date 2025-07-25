@@ -47,6 +47,7 @@ const youtubeSearchTool = ai.defineTool(
       query: z
         .string()
         .describe('The search query for YouTube videos.'),
+      maxResults: z.number().optional().default(10).describe('The maximum number of results to return.'),
     }),
     outputSchema: z.object({
       results: z.array(
@@ -64,7 +65,7 @@ const youtubeSearchTool = ai.defineTool(
       throw new Error('YouTube API key is not configured.');
     }
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${input.query}&key=${apiKey}&type=video&maxResults=5`
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${input.query}&key=${apiKey}&type=video&maxResults=${input.maxResults}`
     );
     const data = await response.json();
     if (data.error) {
@@ -85,7 +86,9 @@ const prompt = ai.definePrompt({
   input: {schema: GeneratePlaylistInputSchema},
   output: {schema: z.any()},
   tools: [youtubeSearchTool],
-  prompt: `You are a playlist generation assistant. Based on the user's prompt, generate a playlist of 5 videos by searching YouTube.
+  prompt: `You are a playlist generation assistant. Based on the user's prompt, generate a playlist of 10 videos by searching YouTube.
+
+If the user is asking for a series, try to find all the episodes in order. You can do this by searching for the series name and then looking for titles that include "Episode 1", "Ep 1", or similar patterns. Be sure to check for official channels.
 
 Prompt: {{{prompt}}}
   
