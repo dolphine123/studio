@@ -35,6 +35,11 @@ export default function Home() {
   const handleRemoveVideo = (videoId: string) => {
     setPlaylist(playlist.filter((video) => video.id !== videoId));
   };
+  
+  const handleClearPlaylist = () => {
+    setPlaylist([]);
+    setCurrentVideo(null);
+  };
 
   return (
     <main className="min-h-screen bg-background text-foreground font-body">
@@ -71,6 +76,7 @@ export default function Home() {
             onAddVideo={handleAddVideo}
             onRemoveVideo={handleRemoveVideo}
             onSelectVideo={handleSelectVideo}
+            onClearPlaylist={handleClearPlaylist}
             currentVideoId={currentVideo?.id}
           />
         </div>

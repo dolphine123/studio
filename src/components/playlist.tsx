@@ -10,6 +10,18 @@ import AddVideoForm from "./add-video-form";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import YoutubeSearch from "./youtube-search";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface PlaylistProps {
   playlist: Video[];
@@ -17,6 +29,7 @@ interface PlaylistProps {
   onAddVideo: (video: Video) => void;
   onRemoveVideo: (videoId: string) => void;
   onSelectVideo: (video: Video) => void;
+  onClearPlaylist: () => void;
 }
 
 export default function Playlist({
@@ -25,7 +38,9 @@ export default function Playlist({
   onAddVideo,
   onRemoveVideo,
   onSelectVideo,
+  onClearPlaylist,
 }: PlaylistProps) {
+  const { toast } = useToast();
   const getThumbnailUrl = (video: Video) => {
     if (video.platform === "youtube") {
       return `https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg`;
@@ -33,9 +48,15 @@ export default function Playlist({
     if (video.platform === "dailymotion") {
         return `https://www.dailymotion.com/thumbnail/video/${video.videoId}`;
     }
-    // Note: Vimeo thumbnails are not directly accessible without API calls.
-    // Using a placeholder for now.
     return `https://placehold.co/120x90.png`;
+  };
+
+  const handleClear = () => {
+    onClearPlaylist();
+    toast({
+      title: "Playlist Cleared",
+      description: "All videos have been removed from your playlist.",
+    });
   };
 
   return (
@@ -43,6 +64,28 @@ export default function Playlist({
       <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
         <CardTitle className="font-headline text-2xl">Playlist</CardTitle>
         <div className="flex items-center gap-2">
+           <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="outline" disabled={playlist.length === 0}>
+                <Trash2 className="mr-2 h-4 w-4" /> Clear
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete all
+                  videos from your playlist.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClear}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <YoutubeSearch onAddVideo={onAddVideo}>
             <Button size="sm" variant="outline">
               <Search className="mr-2 h-4 w-4" /> Search
@@ -50,7 +93,7 @@ export default function Playlist({
           </YoutubeSearch>
           <AddVideoForm onAddVideo={onAddVideo}>
             <Button size="sm" variant="outline">
-              <Plus className="mr-2 h-4 w-4" /> Add Video
+              <Plus className="mr-2 h-4 w-4" /> Add
             </Button>
           </AddVideoForm>
         </div>
@@ -94,7 +137,7 @@ export default function Playlist({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 transition-opacity text-muted-foreground hover:text-destructive"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
                     onClick={(e) => {
                       e.stopPropagation();
                       onRemoveVideo(video.id);
