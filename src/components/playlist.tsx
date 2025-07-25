@@ -4,10 +4,11 @@ import type { Video } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Trash2, Clapperboard, Music } from "lucide-react";
+import { Plus, Trash2, Clapperboard, Music, Search } from "lucide-react";
 import AddVideoForm from "./add-video-form";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import YoutubeSearch from "./youtube-search";
 
 interface PlaylistProps {
   playlist: Video[];
@@ -28,11 +29,18 @@ export default function Playlist({
     <Card className="lg:h-screen lg:flex lg:flex-col border-0 lg:border-none lg:rounded-none">
       <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
         <CardTitle className="font-headline text-2xl">Playlist</CardTitle>
-        <AddVideoForm onAddVideo={onAddVideo}>
-          <Button size="sm" variant="outline">
-            <Plus className="mr-2 h-4 w-4" /> Add Video
-          </Button>
-        </AddVideoForm>
+        <div className="flex items-center gap-2">
+          <YoutubeSearch onAddVideo={onAddVideo}>
+            <Button size="sm" variant="outline">
+              <Search className="mr-2 h-4 w-4" /> Search
+            </Button>
+          </YoutubeSearch>
+          <AddVideoForm onAddVideo={onAddVideo}>
+            <Button size="sm" variant="outline">
+              <Plus className="mr-2 h-4 w-4" /> Add Video
+            </Button>
+          </AddVideoForm>
+        </div>
       </CardHeader>
       <CardContent className="p-0 flex-1">
         <ScrollArea className="h-[calc(100vh-10rem)] lg:h-[calc(100vh-5.5rem)]">
