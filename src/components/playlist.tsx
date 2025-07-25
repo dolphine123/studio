@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Trash2, Clapperboard, Music, Search, Pencil, X } from "lucide-react";
+import { Plus, Trash2, Clapperboard, Music, Search, Pencil, X, Sparkles } from "lucide-react";
 import AddVideoForm from "./add-video-form";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -25,11 +25,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "./ui/checkbox";
 import { suggestedVideos } from "@/lib/suggestions";
 import { Separator } from "./ui/separator";
+import AiPlaylistForm from "./ai-playlist-form";
 
 interface PlaylistProps {
   playlist: Video[];
   currentVideoId?: string;
   onAddVideo: (video: Video) => void;
+  onAddMultipleVideos: (videos: Video[]) => void;
   onRemoveVideo: (videoId: string) => void;
   onSelectVideo: (video: Video) => void;
   onClearPlaylist: () => void;
@@ -43,6 +45,7 @@ export default function Playlist({
   playlist,
   currentVideoId,
   onAddVideo,
+  onAddMultipleVideos,
   onRemoveVideo,
   onSelectVideo,
   onClearPlaylist,
@@ -119,6 +122,11 @@ export default function Playlist({
               <Button size="sm" variant="outline" onClick={() => onEditModeChange(true)} disabled={playlist.length === 0}>
                 <Pencil className="mr-2 h-4 w-4" /> Edit
               </Button>
+              <AiPlaylistForm onPlaylistGenerated={onAddMultipleVideos}>
+                 <Button size="sm" variant="outline">
+                  <Sparkles className="mr-2 h-4 w-4 text-accent" /> AI Playlist
+                </Button>
+              </AiPlaylistForm>
               <YoutubeSearch onAddVideo={onAddVideo} onSelectVideo={onSelectVideo}>
                 <Button size="sm" variant="outline">
                   <Search className="mr-2 h-4 w-4" /> Search

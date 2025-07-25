@@ -3,6 +3,7 @@
 import { generateCopyrightFreeMusic, CopyrightFreeMusicInput } from '@/ai/flows/audio-only-mode';
 import { getCopyrightComplianceSuggestions, CopyrightComplianceInput } from '@/ai/flows/copyright-compliance-suggestions';
 import { getVideoIntelligence, VideoIntelligenceInput } from '@/ai/flows/video-intelligence';
+import { generatePlaylist, GeneratePlaylistInput } from '@/ai/flows/generate-playlist';
 import { z } from 'zod';
 
 const audioSchema = z.object({
@@ -57,5 +58,22 @@ export async function runVideoIntelligence(input: VideoIntelligenceInput) {
     } catch (error) {
         console.error(error);
         return { summary: "Sorry, I couldn't generate a summary at this time.", keyMoments: [] };
+    }
+}
+
+const playlistSchema = z.object({
+    prompt: z.string(),
+});
+
+export async function runGeneratePlaylist(input: GeneratePlaylistInput) {
+    const validatedInput = playlistSchema.safeParse(input);
+    if (!validatedInput.success) {
+        throw new Error('Invalid input for playlist generation.');
+    }
+    try {
+        return await generatePlaylist(validatedInput.data);
+    } catch (error) {
+        console.error(error);
+        return { videos: [] };
     }
 }

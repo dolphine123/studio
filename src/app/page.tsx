@@ -44,6 +44,15 @@ export default function Home() {
     }
   };
 
+  const handleAddMultipleVideos = (videos: Video[]) => {
+    const newVideos = videos.filter(video => !playlist.some(p => p.videoId === video.videoId && p.platform === video.platform));
+    const newPlaylist = [...playlist, ...newVideos];
+    setPlaylist(newPlaylist);
+    if (!currentVideo && newPlaylist.length > 0) {
+      setCurrentVideo(newPlaylist[0]);
+    }
+  }
+
   const handleRemoveVideo = (videoId: string) => {
     setPlaylist(playlist.filter((video) => video.id !== videoId));
   };
@@ -102,6 +111,7 @@ export default function Home() {
           <Playlist
             playlist={playlist}
             onAddVideo={handleAddVideo}
+            onAddMultipleVideos={handleAddMultipleVideos}
             onRemoveVideo={handleRemoveVideo}
             onSelectVideo={handleSelectVideo}
             onClearPlaylist={handleClearPlaylist}
