@@ -93,7 +93,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground hidden md:block">download this app to watch web series</p>
-                <Button onClick={() => window.open("https://castleapps.org/", "_blank")}>Web Series</Button>
+                <Button onClick={() => window.open("https://www.pikashowonline.net/", "_blank")}>Web Series</Button>
               </div>
             </div>
 
