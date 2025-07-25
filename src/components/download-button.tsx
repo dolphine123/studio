@@ -14,7 +14,20 @@ export default function DownloadButton({ video }: DownloadButtonProps) {
   const { toast } = useToast();
 
   const handleDownload = async () => {
-    const videoUrl = `https://www.youtube.com/watch?v=${video.youtubeId}`;
+    let videoUrl = "";
+    if (video.platform === "youtube") {
+      videoUrl = `https://www.youtube.com/watch?v=${video.videoId}`;
+    } else if (video.platform === "vimeo") {
+      videoUrl = `https://vimeo.com/${video.videoId}`;
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Download not supported",
+            description: "This video platform is not supported for download.",
+        });
+        return;
+    }
+    
     const downloadServiceUrl = `https://ssyoutube.com/en803AM/`;
 
     try {
@@ -36,7 +49,7 @@ export default function DownloadButton({ video }: DownloadButtonProps) {
   };
 
   return (
-    <Button variant="outline" className="w-full" onClick={handleDownload}>
+    <Button variant="outline" className="w-full" onClick={handleDownload} disabled={video.platform === 'unknown'}>
       <Download className="mr-2 h-4 w-4 text-accent" />
       <span>Download Video</span>
     </Button>

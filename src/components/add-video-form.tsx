@@ -5,7 +5,7 @@ import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { getYoutubeVideoId } from "@/lib/utils";
+import { parseVideoUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,8 +37,8 @@ interface AddVideoFormProps {
 
 const formSchema = z.object({
   url: z.string().url({ message: "Please enter a valid URL." }).refine(
-    (url) => getYoutubeVideoId(url) !== null,
-    { message: "Please enter a valid YouTube video URL." }
+    (url) => parseVideoUrl(url).id !== null,
+    { message: "Please enter a valid YouTube or Vimeo video URL." }
   ),
   title: z.string().min(3, { message: "Title must be at least 3 characters." }),
   description: z.string().optional(),
@@ -50,7 +50,6 @@ export default function AddVideoForm({
   onAddVideo,
 }: AddVideoFormProps) {
   const [open, setOpen] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -63,47 +62,18 @@ export default function AddVideoForm({
     },
   });
 
-  const handleUrlBlur = async () => {
-    const url = form.getValues("url");
-    const videoId = getYoutubeVideoId(url);
-    if (videoId) {
-      setIsFetching(true);
-      try {
-        const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
-        const response = await fetch(
-          `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet`
-        );
-        const data = await response.json();
-        if (data.items && data.items.length > 0) {
-          const snippet = data.items[0].snippet;
-          form.setValue("title", snippet.title);
-          form.setValue("description", snippet.description);
-          form.setValue("tags", (snippet.tags || []).join(", "));
-        }
-      } catch (error) {
-        console.error("Failed to fetch video details", error);
-        toast({
-            variant: "destructive",
-            title: "Error fetching video details",
-            description: "Could not fetch video details from YouTube.",
-        })
-      } finally {
-        setIsFetching(false);
-      }
-    }
-  };
-
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const youtubeId = getYoutubeVideoId(values.url);
-    if (!youtubeId) {
+    const parsedUrl = parseVideoUrl(values.url);
+    if (!parsedUrl.id) {
       // This should be caught by validation, but as a fallback
-      form.setError("url", { message: "Invalid YouTube URL provided." });
+      form.setError("url", { message: "Invalid video URL provided." });
       return;
     }
 
     const newVideo: Video = {
       id: crypto.randomUUID(),
-      youtubeId,
+      videoId: parsedUrl.id,
+      platform: parsedUrl.platform,
       title: values.title,
       description: values.description || "",
       tags: values.tags || "",
@@ -125,7 +95,7 @@ export default function AddVideoForm({
         <DialogHeader>
           <DialogTitle className="font-headline">Add a New Video</DialogTitle>
           <DialogDescription>
-            Paste a YouTube URL and we'll fetch the details for you.
+            Paste a YouTube or Vimeo URL.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -135,21 +105,15 @@ export default function AddVideoForm({
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>YouTube URL</FormLabel>
+                  <FormLabel>Video URL</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://www.youtube.com/watch?v=..." {...field} onBlur={handleUrlBlur}/>
+                    <Input placeholder="https://www.youtube.com/watch?v=..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {isFetching ? (
-                <div className="flex items-center justify-center p-8 gap-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-muted-foreground">Fetching video details...</p>
-                </div>
-            ) : (
-            <>
+            
             <FormField
               control={form.control}
               name="title"
@@ -193,10 +157,8 @@ export default function AddVideoForm({
                 </FormItem>
               )}
             />
-            </>
-            )}
             <DialogFooter>
-              <Button type="submit" disabled={form.formState.isSubmitting || isFetching}>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? "Adding..." : "Add Video"}
               </Button>
             </DialogFooter>

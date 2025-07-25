@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Video } from "@/types";
@@ -25,6 +26,15 @@ export default function Playlist({
   onRemoveVideo,
   onSelectVideo,
 }: PlaylistProps) {
+  const getThumbnailUrl = (video: Video) => {
+    if (video.platform === "youtube") {
+      return `https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg`;
+    }
+    // Note: Vimeo thumbnails are not directly accessible without API calls.
+    // Using a placeholder for now.
+    return `https://placehold.co/120x90.png`;
+  };
+
   return (
     <Card className="lg:h-screen lg:flex lg:flex-col border-0 lg:border-none lg:rounded-none">
       <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
@@ -59,11 +69,12 @@ export default function Playlist({
                 >
                   <div className="relative flex-shrink-0 w-24 h-14 rounded-md overflow-hidden">
                     <Image
-                      src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`}
+                      src={getThumbnailUrl(video)}
                       alt={video.title}
                       fill
                       sizes="6rem"
                       className="object-cover"
+                      data-ai-hint={video.platform === 'vimeo' ? 'abstract video' : undefined}
                     />
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                         <Clapperboard className="h-6 w-6 text-white/80" />

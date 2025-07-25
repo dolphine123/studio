@@ -98,7 +98,8 @@ export default function YoutubeSearch({
   function handleAddVideo(searchResult: YoutubeSearchResult) {
     const newVideo: Video = {
       id: crypto.randomUUID(),
-      youtubeId: searchResult.id.videoId,
+      videoId: searchResult.id.videoId,
+      platform: 'youtube',
       title: searchResult.snippet.title,
       description: searchResult.snippet.description || "",
       tags: (searchResult.snippet.tags || []).join(", "),

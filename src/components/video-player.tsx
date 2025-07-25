@@ -14,18 +14,29 @@ interface VideoPlayerProps {
   video: Video;
 }
 
+const getEmbedUrl = (video: Video): string | null => {
+    if (video.platform === 'youtube') {
+        return `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
+    }
+    if (video.platform === 'vimeo') {
+        return `https://player.vimeo.com/video/${video.videoId}?autoplay=1`;
+    }
+    return null;
+}
+
 export default function VideoPlayer({ video }: VideoPlayerProps) {
   const [isAudioOnly, setIsAudioOnly] = useState(false);
+  const embedUrl = getEmbedUrl(video);
 
   return (
     <Card className="w-full shadow-lg">
-      {!isAudioOnly && (
+      {!isAudioOnly && embedUrl && (
         <div className="aspect-video w-full overflow-hidden rounded-t-lg">
           <iframe
             key={video.id}
             width="100%"
             height="100%"
-            src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1`}
+            src={embedUrl}
             title={video.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
