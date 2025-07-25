@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Search, Plus, Eye } from "lucide-react";
 import Image from "next/image";
 import { ScrollArea } from "./ui/scroll-area";
+import { Badge } from "./ui/badge";
 
 interface YoutubeSearchProps {
   children: ReactNode;
@@ -196,6 +197,7 @@ export default function YoutubeSearch({
                           <div className="flex-1 w-full overflow-hidden">
                             <p className="font-semibold text-sm truncate">{result.snippet.title}</p>
                             <p className="text-xs text-muted-foreground line-clamp-2">{result.snippet.description}</p>
+                            <Badge variant="outline" className="mt-1 capitalize text-xs">YouTube</Badge>
                              <div className="flex w-full gap-2 mt-2">
                                 <Button
                                   size="sm"

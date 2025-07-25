@@ -26,6 +26,7 @@ import { Checkbox } from "./ui/checkbox";
 import { suggestedVideos } from "@/lib/suggestions";
 import { Separator } from "./ui/separator";
 import AiPlaylistForm from "./ai-playlist-form";
+import { Badge } from "./ui/badge";
 
 interface PlaylistProps {
   playlist: Video[];
@@ -187,6 +188,7 @@ export default function Playlist({
                     <p className="text-xs text-muted-foreground line-clamp-2">
                       {video.description}
                     </p>
+                    <Badge variant="outline" className="mt-1 capitalize text-xs">{video.platform}</Badge>
                   </div>
                 </div>
               ))}
@@ -226,9 +228,10 @@ export default function Playlist({
                       <p className="font-semibold text-sm truncate text-foreground">
                         {video.title}
                       </p>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
+                       <p className="text-xs text-muted-foreground line-clamp-2">
                         {video.description}
                       </p>
+                      <Badge variant="outline" className="mt-1 capitalize text-xs">{video.platform}</Badge>
                     </div>
                     <Button
                       variant="outline"
