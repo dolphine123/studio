@@ -1,0 +1,44 @@
+"use client";
+
+import type { Video } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface DownloadButtonProps {
+  video: Video;
+}
+
+export default function DownloadButton({ video }: DownloadButtonProps) {
+  const { toast } = useToast();
+
+  const handleDownload = () => {
+    const videoUrl = `https://www.youtube.com/watch?v=${video.youtubeId}`;
+    const downloadServiceUrl = `https://ssyoutube.com/en803AM/`;
+
+    // Copy to clipboard and open link
+    navigator.clipboard.writeText(videoUrl).then(() => {
+        toast({
+            title: "URL Copied!",
+            description: "The video URL has been copied to your clipboard.",
+        });
+        window.open(downloadServiceUrl, "_blank");
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+        toast({
+            variant: "destructive",
+            title: "Copy Failed",
+            description: "Could not copy the video URL to the clipboard.",
+        });
+        // Still open the download site
+        window.open(downloadServiceUrl, "_blank");
+    });
+  };
+
+  return (
+    <Button variant="outline" className="w-full" onClick={handleDownload}>
+      <Download className="mr-2 h-4 w-4 text-accent" />
+      <span>Download Video</span>
+    </Button>
+  );
+}

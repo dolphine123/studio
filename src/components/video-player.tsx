@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import AudioOnlyMode from "@/components/audio-only-mode";
 import CopyrightHelper from "@/components/copyright-helper";
 import { Separator } from "@/components/ui/separator";
+import DownloadButton from "./download-button";
 
 interface VideoPlayerProps {
   video: Video;
@@ -32,9 +33,10 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
       </CardHeader>
       <CardContent>
         <Separator className="my-4" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <AudioOnlyMode video={video} />
             <CopyrightHelper video={video} />
+            <DownloadButton video={video} />
         </div>
       </CardContent>
     </Card>
