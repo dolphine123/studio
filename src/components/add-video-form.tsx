@@ -38,7 +38,7 @@ interface AddVideoFormProps {
 const formSchema = z.object({
   url: z.string().url({ message: "Please enter a valid URL." }).refine(
     (url) => parseVideoUrl(url).id !== null,
-    { message: "Please enter a valid YouTube or Vimeo video URL." }
+    { message: "Please enter a valid YouTube, Vimeo, or Dailymotion video URL." }
   ),
   title: z.string().min(3, { message: "Title must be at least 3 characters." }),
   description: z.string().optional(),
@@ -95,7 +95,7 @@ export default function AddVideoForm({
         <DialogHeader>
           <DialogTitle className="font-headline">Add a New Video</DialogTitle>
           <DialogDescription>
-            Paste a YouTube or Vimeo URL.
+            Paste a YouTube, Vimeo, or Dailymotion URL.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

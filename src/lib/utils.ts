@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export type VideoPlatform = "youtube" | "vimeo" | "unknown";
+export type VideoPlatform = "youtube" | "vimeo" | "dailymotion" | "unknown";
 
 export interface ParsedVideoUrl {
   id: string | null;
@@ -27,6 +27,13 @@ export function parseVideoUrl(url: string): ParsedVideoUrl {
   match = url.match(regExp);
   if (match && match[1]) {
     return { id: match[1], platform: "vimeo" };
+  }
+
+  // Dailymotion
+  regExp = /^.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/;
+  match = url.match(regExp);
+  if (match && (match[2] || match[4])) {
+    return { id: match[4] || match[2], platform: "dailymotion" };
   }
 
   return { id: null, platform: "unknown" };

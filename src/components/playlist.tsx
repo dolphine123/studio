@@ -30,6 +30,9 @@ export default function Playlist({
     if (video.platform === "youtube") {
       return `https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg`;
     }
+    if (video.platform === "dailymotion") {
+        return `https://www.dailymotion.com/thumbnail/video/${video.videoId}`;
+    }
     // Note: Vimeo thumbnails are not directly accessible without API calls.
     // Using a placeholder for now.
     return `https://placehold.co/120x90.png`;

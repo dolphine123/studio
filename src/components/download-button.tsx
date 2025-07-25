@@ -19,7 +19,10 @@ export default function DownloadButton({ video }: DownloadButtonProps) {
       videoUrl = `https://www.youtube.com/watch?v=${video.videoId}`;
     } else if (video.platform === "vimeo") {
       videoUrl = `https://vimeo.com/${video.videoId}`;
-    } else {
+    } else if (video.platform === "dailymotion") {
+        videoUrl = `https://www.dailymotion.com/video/${video.videoId}`;
+    }
+    else {
         toast({
             variant: "destructive",
             title: "Download not supported",

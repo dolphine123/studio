@@ -21,6 +21,9 @@ const getEmbedUrl = (video: Video): string | null => {
     if (video.platform === 'vimeo') {
         return `https://player.vimeo.com/video/${video.videoId}?autoplay=1`;
     }
+    if (video.platform === 'dailymotion') {
+        return `https://www.dailymotion.com/embed/video/${video.videoId}?autoplay=1`;
+    }
     return null;
 }
 
