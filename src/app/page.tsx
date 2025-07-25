@@ -33,7 +33,12 @@ export default function Home() {
   };
 
   const handleAddVideo = (video: Video) => {
-    setPlaylist([...playlist, video]);
+    // Check if video is already in playlist
+    if (playlist.some(p => p.videoId === video.videoId && p.platform === video.platform)) {
+      return; // Or show a toast message
+    }
+    const newPlaylist = [...playlist, video];
+    setPlaylist(newPlaylist);
     if (!currentVideo) {
       setCurrentVideo(video);
     }
@@ -99,6 +104,7 @@ export default function Home() {
             onAddVideo={handleAddVideo}
             onRemoveVideo={handleRemoveVideo}
             onSelectVideo={handleSelectVideo}
+            onClearPlaylist={handleClearPlaylist}
             currentVideoId={currentVideo?.id}
             editMode={editMode}
             onEditModeChange={setEditMode}

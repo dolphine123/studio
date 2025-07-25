@@ -3,6 +3,17 @@
 
 import type { Video } from "@/types";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Trash2, Clapperboard, Music, Search, Pencil, X } from "lucide-react";
@@ -12,6 +23,8 @@ import Image from "next/image";
 import YoutubeSearch from "./youtube-search";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "./ui/checkbox";
+import { suggestedVideos } from "@/lib/suggestions";
+import { Separator } from "./ui/separator";
 
 interface PlaylistProps {
   playlist: Video[];
@@ -19,6 +32,7 @@ interface PlaylistProps {
   onAddVideo: (video: Video) => void;
   onRemoveVideo: (videoId: string) => void;
   onSelectVideo: (video: Video) => void;
+  onClearPlaylist: () => void;
   editMode: boolean;
   onEditModeChange: (editing: boolean) => void;
   selectedVideos: Set<string>;
@@ -31,6 +45,7 @@ export default function Playlist({
   onAddVideo,
   onRemoveVideo,
   onSelectVideo,
+  onClearPlaylist,
   editMode,
   onEditModeChange,
   selectedVideos,
@@ -55,6 +70,14 @@ export default function Playlist({
     });
   };
 
+  const handleAddSuggested = (video: Video) => {
+    onAddVideo(video);
+    toast({
+      title: "Video Added!",
+      description: `${video.title} has been added to your playlist.`,
+    })
+  }
+
   return (
     <Card className="flex flex-col border-0 rounded-none h-full">
       <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
@@ -71,6 +94,28 @@ export default function Playlist({
             </>
           ) : (
             <>
+               <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="icon" variant="outline" className="h-9 w-9" disabled={playlist.length === 0}>
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Clear Playlist</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete your entire playlist. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onClearPlaylist}>
+                      Clear Playlist
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <Button size="sm" variant="outline" onClick={() => onEditModeChange(true)} disabled={playlist.length === 0}>
                 <Pencil className="mr-2 h-4 w-4" /> Edit
               </Button>
@@ -135,32 +180,60 @@ export default function Playlist({
                       {video.description}
                     </p>
                   </div>
-                  {!editMode && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onRemoveVideo(video.id);
-                        }}
-                        aria-label="Remove video"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
-              <Music className="h-16 w-16 text-muted-foreground/30" />
-              <p className="mt-4 font-headline text-lg text-muted-foreground">
-                Your playlist is empty
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Click Add Video to start building your collection.
-              </p>
+            <div className="h-full text-center p-4 sm:p-6">
+              <div className="flex flex-col items-center justify-center rounded-lg bg-muted/50 p-8 h-full">
+                <Music className="h-16 w-16 text-muted-foreground/30" />
+                <p className="mt-4 font-headline text-lg text-muted-foreground">
+                  Your playlist is empty
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Add a video or start with one of our suggestions below.
+                </p>
+              </div>
+
+              <Separator className="my-4" />
+
+              <h3 className="font-headline text-xl text-left mb-2">Suggestions</h3>
+               <div className="space-y-2 text-left">
+                {suggestedVideos.map((video) => (
+                  <div
+                    key={video.id}
+                    className={cn("group flex items-center gap-4 p-2 rounded-lg hover:bg-muted")}
+                  >
+                    <div className="relative flex-shrink-0 w-24 h-14 rounded-md overflow-hidden">
+                      <Image
+                        src={getThumbnailUrl(video)}
+                        alt={video.title}
+                        fill
+                        sizes="6rem"
+                        className="object-cover"
+                        data-ai-hint={video.platform === 'vimeo' ? 'abstract creative' : 'music video'}
+                      />
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="font-semibold text-sm truncate text-foreground">
+                        {video.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {video.description}
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => handleAddSuggested(video)}
+                      aria-label="Add suggested video to playlist"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </ScrollArea>
