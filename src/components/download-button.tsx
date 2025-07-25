@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Video } from "@/types";
@@ -12,27 +13,26 @@ interface DownloadButtonProps {
 export default function DownloadButton({ video }: DownloadButtonProps) {
   const { toast } = useToast();
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const videoUrl = `https://www.youtube.com/watch?v=${video.youtubeId}`;
     const downloadServiceUrl = `https://ssyoutube.com/en803AM/`;
 
-    // Copy to clipboard and open link
-    navigator.clipboard.writeText(videoUrl).then(() => {
-        toast({
-            title: "URL Copied!",
-            description: "The video URL has been copied to your clipboard.",
-        });
+    try {
+      await navigator.clipboard.writeText(videoUrl);
+      toast({
+        title: "URL Copied!",
+        description: "The video URL has been copied to your clipboard.",
+      });
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+      toast({
+        variant: "destructive",
+        title: "Copy Failed",
+        description: "Could not copy the video URL. Please copy it manually.",
+      });
+    } finally {
         window.open(downloadServiceUrl, "_blank");
-    }).catch(err => {
-        console.error('Failed to copy: ', err);
-        toast({
-            variant: "destructive",
-            title: "Copy Failed",
-            description: "Could not copy the video URL to the clipboard.",
-        });
-        // Still open the download site
-        window.open(downloadServiceUrl, "_blank");
-    });
+    }
   };
 
   return (
