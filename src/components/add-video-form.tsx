@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, type ReactNode } from "react";
@@ -27,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Video } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface AddVideoFormProps {
   children: ReactNode;
@@ -48,6 +50,7 @@ export default function AddVideoForm({
   onAddVideo,
 }: AddVideoFormProps) {
   const [open, setOpen] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,6 +62,36 @@ export default function AddVideoForm({
       tags: "",
     },
   });
+
+  const handleUrlBlur = async () => {
+    const url = form.getValues("url");
+    const videoId = getYoutubeVideoId(url);
+    if (videoId) {
+      setIsFetching(true);
+      try {
+        const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+        const response = await fetch(
+          `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet`
+        );
+        const data = await response.json();
+        if (data.items && data.items.length > 0) {
+          const snippet = data.items[0].snippet;
+          form.setValue("title", snippet.title);
+          form.setValue("description", snippet.description);
+          form.setValue("tags", (snippet.tags || []).join(", "));
+        }
+      } catch (error) {
+        console.error("Failed to fetch video details", error);
+        toast({
+            variant: "destructive",
+            title: "Error fetching video details",
+            description: "Could not fetch video details from YouTube.",
+        })
+      } finally {
+        setIsFetching(false);
+      }
+    }
+  };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const youtubeId = getYoutubeVideoId(values.url);
@@ -92,7 +125,7 @@ export default function AddVideoForm({
         <DialogHeader>
           <DialogTitle className="font-headline">Add a New Video</DialogTitle>
           <DialogDescription>
-            Paste a YouTube URL and provide some details to add a video to your playlist.
+            Paste a YouTube URL and we'll fetch the details for you.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -104,12 +137,19 @@ export default function AddVideoForm({
                 <FormItem>
                   <FormLabel>YouTube URL</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://www.youtube.com/watch?v=..." {...field} />
+                    <Input placeholder="https://www.youtube.com/watch?v=..." {...field} onBlur={handleUrlBlur}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            {isFetching ? (
+                <div className="flex items-center justify-center p-8 gap-4">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-muted-foreground">Fetching video details...</p>
+                </div>
+            ) : (
+            <>
             <FormField
               control={form.control}
               name="title"
@@ -132,7 +172,7 @@ export default function AddVideoForm({
                   <FormControl>
                     <Textarea
                       placeholder="A short description of the video"
-                      className="resize-none"
+                      className="resize-none h-24"
                       {...field}
                     />
                   </FormControl>
@@ -153,8 +193,10 @@ export default function AddVideoForm({
                 </FormItem>
               )}
             />
+            </>
+            )}
             <DialogFooter>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button type="submit" disabled={form.formState.isSubmitting || isFetching}>
                 {form.formState.isSubmitting ? "Adding..." : "Add Video"}
               </Button>
             </DialogFooter>
